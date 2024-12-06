@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class AdvertisementController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -21,7 +22,12 @@ class AdvertisementController extends Controller
      */
     public function create()
     {
-        //
+        $form = [
+            'action' => route('advertisements.store'),
+            'method' => 'POST',
+            'fields' => (new Advertisement)->formFields()
+        ];
+        return view('add_advertisement', compact('form'));
     }
 
     /**
@@ -29,7 +35,18 @@ class AdvertisementController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|max:255|min:3',
+            'photo' => 'required|max:255|min:10',
+            'price' => 'required|integer',
+            'category_id' => 'required|integer',
+            'city_id' => 'required|integer',
+        ]);
+
+        $advertisement = new Advertisement($validated);
+        $advertisement->user_id = 1; // По дефолту для таблиц будет первый пользователь, так как не используем авторизацию
+        $advertisement->save();
+        return redirect(route('advertisements.index'));
     }
 
     /**
@@ -46,7 +63,15 @@ class AdvertisementController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $advertisement = Advertisement::with('category')->where('id', $id)->get()->first();
+        $form = false;
+        if ($advertisement) $form = [
+            'action' => route('advertisements.update', $id),
+            'method' => 'PUT',
+            'fields' => $advertisement->formFields()
+        ];
+
+        return view('edit_advertisement', compact('advertisement', 'form'));
     }
 
     /**
@@ -54,7 +79,20 @@ class AdvertisementController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+            'photo' => 'required|max:255|min:10',
+            'price' => 'required|integer',
+            'category_id' => 'required|integer',
+            'city_id' => 'required|integer',
+        ]);
+
+        $advertisement = Advertisement::find($id);
+        foreach ($validated as $field => $value) {
+            $advertisement->$field = $value;
+        }
+        $advertisement->save();
+        return redirect(route('advertisements.index'));
     }
 
     /**
@@ -62,6 +100,7 @@ class AdvertisementController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Advertisement::destroy($id);
+        return redirect(route('advertisements.index'));
     }
 }

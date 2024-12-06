@@ -9,7 +9,7 @@
         @endif
     </h1>
     @if ($advertisement)
-        <table border="1">
+        <table border="1" class="table table-bordered">
             <thead>
                 <tr>
                     <td>Поле</td>
@@ -39,7 +39,7 @@
         @if (count($advertisement->messages))
             <br>
             <h2>Сообщения по объявлению</h2>
-            <table border="1">
+            <table border="1" class="table table-bordered">
                 <thead>
                     <tr>
                         <td>id</td>

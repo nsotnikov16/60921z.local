@@ -3,7 +3,7 @@
 @section('content')
     <h1>Список категорий</h1>
     @if (!empty($categories))
-        <table border="1">
+        <table border="1" class="table table-bordered">
             <thead>
                 <tr>
                     <td>id</td>

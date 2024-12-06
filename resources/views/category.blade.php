@@ -9,7 +9,7 @@
         @endif
     </h1>
     @if (count($category->ads))
-        <table border="1">
+        <table border="1" class="table table-bordered">
             <thead>
                 <tr>
                     <td>id</td>
