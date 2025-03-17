@@ -12,7 +12,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
+        $perPage = request()->input('perPage', 15);
+        $categories = Category::paginate($perPage)->withQueryString();
         return view('categories', compact('categories'));
     }
 
