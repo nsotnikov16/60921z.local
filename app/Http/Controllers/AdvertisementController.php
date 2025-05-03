@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Advertisement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class AdvertisementController extends Controller
 {
@@ -22,6 +23,10 @@ class AdvertisementController extends Controller
      */
     public function create()
     {
+        if (! Gate::allows('create-item')) {
+            return redirect(route('error'))->with('message', 'У вас нет разрешения на добавление объявлений');
+        }
+
         $form = [
             'action' => route('advertisements.store'),
             'method' => 'POST',
@@ -35,6 +40,11 @@ class AdvertisementController extends Controller
      */
     public function store(Request $request)
     {
+
+        if (! Gate::allows('create-item')) {
+            return redirect(route('error'))->with('message', 'У вас нет разрешения на добавление объявлений');
+        }
+
         $validated = $request->validate([
             'name' => 'required|max:255|min:3',
             'photo' => 'required|max:255|min:10',
@@ -100,6 +110,9 @@ class AdvertisementController extends Controller
      */
     public function destroy(string $id)
     {
+        if (! Gate::allows('destroy-item')) {
+            return redirect(route('error'))->with('message', 'У вас нет разрешения на удаление объявления номер ' . $id);
+        }
         Advertisement::destroy($id);
         return redirect(route('advertisements.index'));
     }
