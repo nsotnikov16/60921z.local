@@ -14,7 +14,8 @@ class AdvertisementController extends Controller
      */
     public function index()
     {
-        $ads = Advertisement::with('category')->get();
+        $perPage = request()->input('perPage', 5);
+         $ads = Advertisement::with('category')->paginate($perPage)->appends(request()->query());
         return view('ads', compact('ads'));
     }
 
@@ -24,7 +25,7 @@ class AdvertisementController extends Controller
     public function create()
     {
         if (! Gate::allows('create-item')) {
-            return redirect(route('error'))->with('message', 'У вас нет разрешения на добавление объявлений');
+            return back()->with('danger', 'У вас нет разрешения на добавление объявлений');
         }
 
         $form = [
@@ -42,7 +43,7 @@ class AdvertisementController extends Controller
     {
 
         if (! Gate::allows('create-item')) {
-            return redirect(route('error'))->with('message', 'У вас нет разрешения на добавление объявлений');
+            return back()->with('danger', 'У вас нет разрешения на добавление объявлений');
         }
 
         $validated = $request->validate([
@@ -56,7 +57,7 @@ class AdvertisementController extends Controller
         $advertisement = new Advertisement($validated);
         $advertisement->user_id = 1; // По дефолту для таблиц будет первый пользователь, так как не используем авторизацию
         $advertisement->save();
-        return redirect(route('advertisements.index'));
+        return redirect(route('advertisements.index'))->with('success', 'Объявление добавлено успешно!');
     }
 
     /**
@@ -102,7 +103,7 @@ class AdvertisementController extends Controller
             $advertisement->$field = $value;
         }
         $advertisement->save();
-        return redirect(route('advertisements.index'));
+        return redirect(route('advertisements.index'))->with('success', 'Объявление обновлено успешно!');
     }
 
     /**
@@ -111,9 +112,9 @@ class AdvertisementController extends Controller
     public function destroy(string $id)
     {
         if (! Gate::allows('destroy-item')) {
-            return redirect(route('error'))->with('message', 'У вас нет разрешения на удаление объявления номер ' . $id);
+            return back()->with('danger', 'У вас нет разрешения на удаление объявления номер ' . $id);
         }
         Advertisement::destroy($id);
-        return redirect(route('advertisements.index'));
+        return redirect(route('advertisements.index'))->with('success', 'Объявление удалено успешно!');
     }
 }
