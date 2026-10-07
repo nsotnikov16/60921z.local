@@ -12,7 +12,14 @@ class AdvertisementControllerApi extends Controller
      */
     public function index()
     {
-        return response(Advertisement::all());
+        return response(Advertisement::limit($request->perpage ?? 5)
+            ->offset(($request->perpage ?? 5) * ($request->page ?? 0))
+            ->with('category')->get());
+    }
+
+    public function total()
+    {
+        return response(Advertisement::all()->count());
     }
 
     /**
